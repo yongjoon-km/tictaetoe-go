@@ -32,9 +32,14 @@ func InitializeGame() {
 func GameLoop() {
 	for {
 
-		x, y, val := GetNextMove()
+		x, y, val, hasNextMove := GetNextMove()
+		if !hasNextMove {
+			fmt.Println("Invalid position to place stone.")
+			continue
+		}
 		ok := PlaceStone(x, y, val)
 		if !ok {
+			fmt.Println("Invalid position to place stone.")
 			continue
 		}
 		turn = turn * -1 // Get Next Turn
@@ -48,17 +53,21 @@ func GameLoop() {
 	}
 }
 
-func GetNextMove() (int, int, int) {
+func GetNextMove() (int, int, int, bool) {
+	fmt.Print("x y > ")
 	sc := bufio.NewScanner(os.Stdin)
 	sc.Scan()
 	s := sc.Text()
 	if len(s) == 0 {
-		return 0, 0, 0
+		return 0, 0, 0, false
 	}
 	coordinates := strings.Fields(s)
+	if len(coordinates) != 2 {
+		return 0, 0, 0, false
+	}
 	x, _ := strconv.ParseInt(coordinates[0], 10, 0)
 	y, _ := strconv.ParseInt(coordinates[1], 10, 0)
-	return int(x), int(y), turn
+	return int(x), int(y), turn, true
 }
 
 func PrintGame() {
