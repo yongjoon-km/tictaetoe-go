@@ -23,13 +23,24 @@ func InitializeGame() {
 
 func GameLoop() {
 	for {
+
+		x, y, val := GetNextMove()
+		ok := PlaceStone(x, y, val)
+		if !ok {
+			continue
+		}
+
+		PrintGame()
 		winner := GetWinner(board)
 		if winner != 0 {
 			fmt.Printf("Game end winner is %d\n", winner)
 			break
 		}
-		PrintGame()
 	}
+}
+
+func GetNextMove() (int, int, int) {
+	return 0, 0, 1
 }
 
 func PrintGame() {
@@ -86,4 +97,14 @@ func GetWinner(board [3][3]int) int {
 		return board[0][2]
 	}
 	return 0
+}
+
+func PlaceStone(x, y, val int) bool {
+
+	if board[x][y] != 0 {
+		return false
+	}
+
+	board[x][y] = val
+	return true
 }
