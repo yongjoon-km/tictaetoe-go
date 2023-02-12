@@ -119,6 +119,10 @@ func GetWinner(board [3][3]int) int {
 
 func PlaceStone(x, y, val int) bool {
 
+	if x < 0 || x >= 3 || y < 0 || y >= 3 {
+		return false
+	}
+
 	if board[x][y] != 0 {
 		return false
 	}
