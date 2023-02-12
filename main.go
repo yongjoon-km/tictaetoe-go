@@ -1,8 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
 
 var board [3][3]int
+var turn int
 
 func main() {
 	InitializeGame()
@@ -19,6 +26,7 @@ func InitializeGame() {
 		}
 		i++
 	}
+	turn = 1 // O first
 }
 
 func GameLoop() {
@@ -29,6 +37,7 @@ func GameLoop() {
 		if !ok {
 			continue
 		}
+		turn = turn * -1 // Get Next Turn
 
 		PrintGame()
 		winner := GetWinner(board)
@@ -40,7 +49,16 @@ func GameLoop() {
 }
 
 func GetNextMove() (int, int, int) {
-	return 0, 0, 1
+	sc := bufio.NewScanner(os.Stdin)
+	sc.Scan()
+	s := sc.Text()
+	if len(s) == 0 {
+		return 0, 0, 0
+	}
+	coordinates := strings.Fields(s)
+	x, _ := strconv.ParseInt(coordinates[0], 10, 0)
+	y, _ := strconv.ParseInt(coordinates[1], 10, 0)
+	return int(x), int(y), turn
 }
 
 func PrintGame() {
