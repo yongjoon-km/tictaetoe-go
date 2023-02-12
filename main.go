@@ -17,14 +17,10 @@ func main() {
 }
 
 func InitializeGame() {
-	i := 0
-	for i < 3 {
-		j := 0
-		for j < 3 {
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
 			board[i][j] = 0
-			j++
 		}
-		i++
 	}
 	turn = 1 // O first
 }
@@ -71,16 +67,12 @@ func GetNextMove() (int, int, int, bool) {
 }
 
 func PrintGame() {
-	i := 0
-	for i < 3 {
-		j := 0
-		for j < 3 {
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
 			c := ConvertToChar(board[i][j])
 			fmt.Printf("%s|", c)
-			j++
 		}
 		fmt.Println()
-		i++
 	}
 }
 
@@ -98,22 +90,17 @@ func ConvertToChar(num int) string {
 func GetWinner(board [3][3]int) int {
 
 	// horizontal match
-	i := 0
-	for i < 3 {
+	for i := 0; i < 3; i++ {
 		if board[i][0] == board[i][1] && board[i][0] == board[i][2] {
 			return board[i][0]
 		}
-		i++
 	}
 
 	// vertical match
-
-	j := 0
-	for j < 3 {
+	for j := 0; j < 3; j++ {
 		if board[0][j] == board[1][j] && board[0][j] == board[2][j] {
 			return board[0][j]
 		}
-		j++
 	}
 
 	// diagonal match
