@@ -33,16 +33,14 @@ func GameLoop() {
 			fmt.Println("Invalid position to place stone.")
 			continue
 		}
-		ok := PlaceStone(x, y, val)
-		if !ok {
+		if ok := PlaceStone(x, y, val); !ok {
 			fmt.Println("Invalid position to place stone.")
 			continue
 		}
 		turn = turn * -1 // Get Next Turn
 
 		PrintGame()
-		winner := GetWinner(board)
-		if winner != 0 {
+		if winner := GetWinner(board); winner != 0 {
 			fmt.Printf("Game end winner is %d\n", winner)
 			break
 		}
