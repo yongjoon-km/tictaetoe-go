@@ -12,9 +12,9 @@ var board [3][3]int
 var turn int
 
 const (
-	NONE = iota
-	ZERO
-	CROSS
+	NONE  = 0
+	ROUND = 1
+	CROSS = -1
 )
 
 func main() {
@@ -25,10 +25,10 @@ func main() {
 func InitializeGame() {
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
-			board[i][j] = 0
+			board[i][j] = NONE
 		}
 	}
-	turn = 1 // O first
+	turn = ROUND // O first
 }
 
 func GameLoop() {
@@ -84,7 +84,7 @@ func ConvertToChar(num int) string {
 	if num == NONE {
 		return " "
 	}
-	if num == ZERO {
+	if num == ROUND {
 		return "O"
 	} else {
 		return "X"
