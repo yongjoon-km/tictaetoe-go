@@ -46,8 +46,6 @@ func GameLoop() {
 		turn = turn * -1 // Get Next Turn
 
 		PrintGame()
-		if winner := GetWinner(board); winner != 0 {
-			fmt.Printf("Game end winner is %d\n", winner)
 		if winner := GetWinner(board); winner != NONE {
 			fmt.Printf("Game end winner is %s\n", ConvertToChar(winner))
 			break
@@ -97,23 +95,23 @@ func GetWinner(board [3][3]int) int {
 
 	// horizontal match
 	for i := 0; i < 3; i++ {
-		if board[i][0] == board[i][1] && board[i][0] == board[i][2] {
+		if board[i][0] != NONE && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
 			return board[i][0]
 		}
 	}
 
 	// vertical match
 	for j := 0; j < 3; j++ {
-		if board[0][j] == board[1][j] && board[0][j] == board[2][j] {
+		if board[0][j] != NONE && board[0][j] == board[1][j] && board[0][j] == board[2][j] {
 			return board[0][j]
 		}
 	}
 
 	// diagonal match
-	if board[0][0] == board[1][1] && board[0][0] == board[2][2] {
+	if board[0][0] != NONE && board[0][0] == board[1][1] && board[0][0] == board[2][2] {
 		return board[0][0]
 	}
-	if board[0][2] == board[1][1] && board[0][2] == board[2][0] {
+	if board[0][0] != NONE && board[0][2] == board[1][1] && board[0][2] == board[2][0] {
 		return board[0][2]
 	}
 	return NONE
