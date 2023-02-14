@@ -11,6 +11,12 @@ import (
 var board [3][3]int
 var turn int
 
+const (
+	NONE = iota
+	ZERO
+	CROSS
+)
+
 func main() {
 	InitializeGame()
 	GameLoop()
@@ -42,6 +48,8 @@ func GameLoop() {
 		PrintGame()
 		if winner := GetWinner(board); winner != 0 {
 			fmt.Printf("Game end winner is %d\n", winner)
+		if winner := GetWinner(board); winner != NONE {
+			fmt.Printf("Game end winner is %s\n", ConvertToChar(winner))
 			break
 		}
 	}
@@ -75,10 +83,10 @@ func PrintGame() {
 }
 
 func ConvertToChar(num int) string {
-	if num == 0 {
+	if num == NONE {
 		return " "
 	}
-	if num == 1 {
+	if num == ZERO {
 		return "O"
 	} else {
 		return "X"
@@ -108,7 +116,7 @@ func GetWinner(board [3][3]int) int {
 	if board[0][2] == board[1][1] && board[0][2] == board[2][0] {
 		return board[0][2]
 	}
-	return 0
+	return NONE
 }
 
 func PlaceStone(x, y, val int) bool {
@@ -117,7 +125,7 @@ func PlaceStone(x, y, val int) bool {
 		return false
 	}
 
-	if board[x][y] != 0 {
+	if board[x][y] != NONE {
 		return false
 	}
 
