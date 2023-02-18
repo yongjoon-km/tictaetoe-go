@@ -52,7 +52,7 @@ func GameLoop(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) {
 		PrintGame()
 		if winner := GetWinner(board); winner != NONE {
 			fmt.Printf("Game end winner is %s\n", ConvertToChar(winner))
-			sigCh <- false
+			sigCh <- false // signal to end game
 			break
 		}
 	}
