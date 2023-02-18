@@ -36,20 +36,13 @@ func InitializeGame() (*sync.WaitGroup, chan Location, chan bool) {
 	wg.Add(2)
 	locationCh := make(chan Location)
 	sigCh := make(chan bool)
-
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			board[i][j] = NONE
-		}
-	}
 	turn = ROUND // O first
 	return &wg, locationCh, sigCh
 }
 
 func GameLoop(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) {
 	defer wg.Done()
-	for {
-		sigCh <- true // send signal to recieve next move from GetNextMove
+	for sigCh <- true; ; sigCh <- true {
 		if ok := PlaceStone(locationCh); !ok {
 			fmt.Println("Invalid position to place stone.")
 			continue
