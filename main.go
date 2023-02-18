@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var board [3][3]int
@@ -26,9 +25,10 @@ type Location struct {
 
 func main() {
 	InitializeGame()
-	ch := make(chan Location)
-	go GetNextMove(ch)
-	GameLoop(ch)
+	locationCh := make(chan Location)
+	sigCh := make(chan bool)
+	go GetNextMove(locationCh, sigCh)
+	GameLoop(locationCh, sigCh)
 }
 
 func InitializeGame() {
@@ -40,9 +40,9 @@ func InitializeGame() {
 	turn = ROUND // O first
 }
 
-func GameLoop(ch chan Location) {
+func GameLoop(locationCh chan Location, sigCh chan bool) {
 	for {
-		if ok := PlaceStone(ch); !ok {
+		if ok := PlaceStone(locationCh); !ok {
 			fmt.Println("Invalid position to place stone.")
 			continue
 		}
@@ -53,10 +53,11 @@ func GameLoop(ch chan Location) {
 			fmt.Printf("Game end winner is %s\n", ConvertToChar(winner))
 			break
 		}
+		sigCh <- true // send signal to recieve next move from GetNextMove
 	}
 }
 
-func GetNextMove(ch chan Location) {
+func GetNextMove(locationCh chan Location, sigCh chan bool) {
 	for {
 		fmt.Print("x y > ")
 		sc := bufio.NewScanner(os.Stdin)
@@ -73,8 +74,8 @@ func GetNextMove(ch chan Location) {
 		}
 		x, _ := strconv.ParseInt(coordinates[0], 10, 0)
 		y, _ := strconv.ParseInt(coordinates[1], 10, 0)
-		ch <- Location{int(x), int(y), turn}
-		time.Sleep(1 * time.Second)
+		locationCh <- Location{int(x), int(y), turn} // send location to GameLoop
+		<-sigCh                                      // wait GameLoop to be ready for next user input
 	}
 }
 
