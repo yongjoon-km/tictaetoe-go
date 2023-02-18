@@ -65,6 +65,13 @@ func GetNextMove(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) 
 		if !needNext {
 			break
 		}
+		x, y := GetCoordinate()
+		locationCh <- Location{int(x), int(y), turn} // send location to GameLoop
+	}
+}
+
+func GetCoordinate() (int64, int64) {
+	for {
 		fmt.Print("x y > ")
 		sc := bufio.NewScanner(os.Stdin)
 		sc.Scan()
@@ -80,7 +87,7 @@ func GetNextMove(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) 
 		}
 		x, _ := strconv.ParseInt(coordinates[0], 10, 0)
 		y, _ := strconv.ParseInt(coordinates[1], 10, 0)
-		locationCh <- Location{int(x), int(y), turn} // send location to GameLoop
+		return x, y
 	}
 }
 
