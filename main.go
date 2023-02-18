@@ -61,8 +61,7 @@ func GameLoop(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) {
 func GetNextMove(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) {
 	defer wg.Done()
 	for {
-		needNext := <-sigCh // wait GameLoop to be ready for next user input
-		if !needNext {
+		if needNext := <-sigCh; !needNext { // wait GameLoop to be ready for next user input
 			break
 		}
 		x, y := GetCoordinate()
