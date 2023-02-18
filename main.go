@@ -19,10 +19,9 @@ const (
 )
 
 type Location struct {
-	x           int
-	y           int
-	val         int
-	hasNextMove bool
+	x   int
+	y   int
+	val int
 }
 
 func main() {
@@ -43,12 +42,7 @@ func InitializeGame() {
 
 func GameLoop(ch chan Location) {
 	for {
-		location := <-ch
-		if !location.hasNextMove {
-			fmt.Println("Invalid position to place stone.")
-			continue
-		}
-		if ok := PlaceStone(location.x, location.y, location.val); !ok {
+		if ok := PlaceStone(ch); !ok {
 			fmt.Println("Invalid position to place stone.")
 			continue
 		}
@@ -69,15 +63,17 @@ func GetNextMove(ch chan Location) {
 		sc.Scan()
 		s := sc.Text()
 		if len(s) == 0 {
-			ch <- Location{0, 0, 0, false}
+			fmt.Println("Invalid position to place stone.")
+			continue
 		}
 		coordinates := strings.Fields(s)
 		if len(coordinates) != 2 {
-			ch <- Location{0, 0, 0, false}
+			fmt.Println("Invalid position to place stone.")
+			continue
 		}
 		x, _ := strconv.ParseInt(coordinates[0], 10, 0)
 		y, _ := strconv.ParseInt(coordinates[1], 10, 0)
-		ch <- Location{int(x), int(y), turn, true}
+		ch <- Location{int(x), int(y), turn}
 		time.Sleep(1 * time.Second)
 	}
 }
@@ -129,16 +125,17 @@ func GetWinner(board [3][3]int) int {
 	return NONE
 }
 
-func PlaceStone(x, y, val int) bool {
+func PlaceStone(ch chan Location) bool {
 
-	if x < 0 || x >= 3 || y < 0 || y >= 3 {
+	location := <-ch
+	if location.x < 0 || location.x >= 3 || location.y < 0 || location.y >= 3 {
 		return false
 	}
 
-	if board[x][y] != NONE {
+	if board[location.x][location.y] != NONE {
 		return false
 	}
 
-	board[x][y] = val
+	board[location.x][location.y] = location.val
 	return true
 }
