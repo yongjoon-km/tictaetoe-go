@@ -52,6 +52,7 @@ func GameLoop(locationCh chan Location, sigCh chan bool) {
 		PrintGame()
 		if winner := GetWinner(board); winner != NONE {
 			fmt.Printf("Game end winner is %s\n", ConvertToChar(winner))
+			sigCh <- false
 			break
 		}
 	}
@@ -59,7 +60,10 @@ func GameLoop(locationCh chan Location, sigCh chan bool) {
 
 func GetNextMove(locationCh chan Location, sigCh chan bool) {
 	for {
-		<-sigCh // wait GameLoop to be ready for next user input
+		needNext := <-sigCh // wait GameLoop to be ready for next user input
+		if !needNext {
+			break
+		}
 		fmt.Print("x y > ")
 		sc := bufio.NewScanner(os.Stdin)
 		sc.Scan()
