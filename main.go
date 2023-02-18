@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 var board [3][3]int
@@ -24,11 +25,14 @@ type Location struct {
 }
 
 func main() {
+	var wg sync.WaitGroup
+	wg.Add(2)
 	InitializeGame()
 	locationCh := make(chan Location)
 	sigCh := make(chan bool)
-	go GetNextMove(locationCh, sigCh)
-	GameLoop(locationCh, sigCh)
+	go GetNextMove(&wg, locationCh, sigCh)
+	go GameLoop(&wg, locationCh, sigCh)
+	wg.Wait()
 }
 
 func InitializeGame() {
@@ -40,7 +44,8 @@ func InitializeGame() {
 	turn = ROUND // O first
 }
 
-func GameLoop(locationCh chan Location, sigCh chan bool) {
+func GameLoop(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) {
+	defer wg.Done()
 	for {
 		sigCh <- true // send signal to recieve next move from GetNextMove
 		if ok := PlaceStone(locationCh); !ok {
@@ -58,7 +63,8 @@ func GameLoop(locationCh chan Location, sigCh chan bool) {
 	}
 }
 
-func GetNextMove(locationCh chan Location, sigCh chan bool) {
+func GetNextMove(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) {
+	defer wg.Done()
 	for {
 		needNext := <-sigCh // wait GameLoop to be ready for next user input
 		if !needNext {
