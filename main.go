@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var board [3][3]int
@@ -17,9 +18,18 @@ const (
 	CROSS = -1
 )
 
+type Location struct {
+	x           int
+	y           int
+	val         int
+	hasNextMove bool
+}
+
 func main() {
 	InitializeGame()
-	GameLoop()
+	ch := make(chan Location)
+	go GetNextMove(ch)
+	GameLoop(ch)
 }
 
 func InitializeGame() {
@@ -31,15 +41,14 @@ func InitializeGame() {
 	turn = ROUND // O first
 }
 
-func GameLoop() {
+func GameLoop(ch chan Location) {
 	for {
-
-		x, y, val, hasNextMove := GetNextMove()
-		if !hasNextMove {
+		location := <-ch
+		if !location.hasNextMove {
 			fmt.Println("Invalid position to place stone.")
 			continue
 		}
-		if ok := PlaceStone(x, y, val); !ok {
+		if ok := PlaceStone(location.x, location.y, location.val); !ok {
 			fmt.Println("Invalid position to place stone.")
 			continue
 		}
@@ -53,21 +62,24 @@ func GameLoop() {
 	}
 }
 
-func GetNextMove() (int, int, int, bool) {
-	fmt.Print("x y > ")
-	sc := bufio.NewScanner(os.Stdin)
-	sc.Scan()
-	s := sc.Text()
-	if len(s) == 0 {
-		return 0, 0, 0, false
+func GetNextMove(ch chan Location) {
+	for {
+		fmt.Print("x y > ")
+		sc := bufio.NewScanner(os.Stdin)
+		sc.Scan()
+		s := sc.Text()
+		if len(s) == 0 {
+			ch <- Location{0, 0, 0, false}
+		}
+		coordinates := strings.Fields(s)
+		if len(coordinates) != 2 {
+			ch <- Location{0, 0, 0, false}
+		}
+		x, _ := strconv.ParseInt(coordinates[0], 10, 0)
+		y, _ := strconv.ParseInt(coordinates[1], 10, 0)
+		ch <- Location{int(x), int(y), turn, true}
+		time.Sleep(1 * time.Second)
 	}
-	coordinates := strings.Fields(s)
-	if len(coordinates) != 2 {
-		return 0, 0, 0, false
-	}
-	x, _ := strconv.ParseInt(coordinates[0], 10, 0)
-	y, _ := strconv.ParseInt(coordinates[1], 10, 0)
-	return int(x), int(y), turn, true
 }
 
 func PrintGame() {
