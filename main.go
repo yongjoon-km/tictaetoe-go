@@ -42,9 +42,9 @@ func InitializeGame() {
 
 func GameLoop(locationCh chan Location, sigCh chan bool) {
 	for {
+		sigCh <- true // send signal to recieve next move from GetNextMove
 		if ok := PlaceStone(locationCh); !ok {
 			fmt.Println("Invalid position to place stone.")
-			sigCh <- true // send signal to recieve next move from GetNextMove
 			continue
 		}
 		turn = turn * -1 // Get Next Turn
@@ -54,12 +54,12 @@ func GameLoop(locationCh chan Location, sigCh chan bool) {
 			fmt.Printf("Game end winner is %s\n", ConvertToChar(winner))
 			break
 		}
-		sigCh <- true // send signal to recieve next move from GetNextMove
 	}
 }
 
 func GetNextMove(locationCh chan Location, sigCh chan bool) {
 	for {
+		<-sigCh // wait GameLoop to be ready for next user input
 		fmt.Print("x y > ")
 		sc := bufio.NewScanner(os.Stdin)
 		sc.Scan()
@@ -76,7 +76,6 @@ func GetNextMove(locationCh chan Location, sigCh chan bool) {
 		x, _ := strconv.ParseInt(coordinates[0], 10, 0)
 		y, _ := strconv.ParseInt(coordinates[1], 10, 0)
 		locationCh <- Location{int(x), int(y), turn} // send location to GameLoop
-		<-sigCh                                      // wait GameLoop to be ready for next user input
 	}
 }
 
