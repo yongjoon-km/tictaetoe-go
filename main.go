@@ -44,6 +44,7 @@ func GameLoop(locationCh chan Location, sigCh chan bool) {
 	for {
 		if ok := PlaceStone(locationCh); !ok {
 			fmt.Println("Invalid position to place stone.")
+			sigCh <- true // send signal to recieve next move from GetNextMove
 			continue
 		}
 		turn = turn * -1 // Get Next Turn
