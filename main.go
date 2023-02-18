@@ -25,23 +25,25 @@ type Location struct {
 }
 
 func main() {
-	var wg sync.WaitGroup
-	wg.Add(2)
-	InitializeGame()
-	locationCh := make(chan Location)
-	sigCh := make(chan bool)
-	go GetNextMove(&wg, locationCh, sigCh)
-	go GameLoop(&wg, locationCh, sigCh)
+	wg, locationCh, sigCh := InitializeGame()
+	go GetNextMove(wg, locationCh, sigCh)
+	go GameLoop(wg, locationCh, sigCh)
 	wg.Wait()
 }
 
-func InitializeGame() {
+func InitializeGame() (*sync.WaitGroup, chan Location, chan bool) {
+	var wg sync.WaitGroup
+	wg.Add(2)
+	locationCh := make(chan Location)
+	sigCh := make(chan bool)
+
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			board[i][j] = NONE
 		}
 	}
 	turn = ROUND // O first
+	return &wg, locationCh, sigCh
 }
 
 func GameLoop(wg *sync.WaitGroup, locationCh chan Location, sigCh chan bool) {
